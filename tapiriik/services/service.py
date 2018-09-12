@@ -25,7 +25,7 @@ class Service:
         raise ValueError
 
     def List():
-        return [
+        return [x for x in [
             RunKeeper,
             Strava,
             GarminConnect,
@@ -45,7 +45,7 @@ class Service:
             Setio,
             Singletracker,
             Aerobia
-        ] + PRIVATE_SERVICES
+        ] + PRIVATE_SERVICES if x is not None]
 
     def PreferredDownloadPriorityList():
         # Ideally, we'd make an informed decision based on whatever features the activity had

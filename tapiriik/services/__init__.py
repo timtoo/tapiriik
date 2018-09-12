@@ -1,43 +1,44 @@
 from .service_base import *
 from .api import *
-from tapiriik.services.RunKeeper import RunKeeperService
-RunKeeper = RunKeeperService()
-from tapiriik.services.Strava import StravaService
-Strava = StravaService()
-from tapiriik.services.Endomondo import EndomondoService
-Endomondo = EndomondoService()
-from tapiriik.services.Dropbox import DropboxService
-Dropbox = DropboxService()
-from tapiriik.services.GarminConnect import GarminConnectService
-GarminConnect = GarminConnectService()
-from tapiriik.services.SportTracks import SportTracksService
-SportTracks = SportTracksService()
-from tapiriik.services.RideWithGPS import RideWithGPSService
-RideWithGPS = RideWithGPSService()
-from tapiriik.services.TrainAsONE import TrainAsONEService
-TrainAsONE = TrainAsONEService()
-from tapiriik.services.TrainingPeaks import TrainingPeaksService
-TrainingPeaks = TrainingPeaksService()
-from tapiriik.services.Motivato import MotivatoService
-Motivato = MotivatoService()
-from tapiriik.services.NikePlus import NikePlusService
-NikePlus = NikePlusService()
-from tapiriik.services.VeloHero import VeloHeroService
-VeloHero = VeloHeroService()
-from tapiriik.services.TrainerRoad import TrainerRoadService
-TrainerRoad = TrainerRoadService()
-from tapiriik.services.Smashrun import SmashrunService
-Smashrun = SmashrunService()
-from tapiriik.services.BeginnerTriathlete import BeginnerTriathleteService
-BeginnerTriathlete = BeginnerTriathleteService()
-from tapiriik.services.Pulsstory import PulsstoryService
-Pulsstory = PulsstoryService()
-from tapiriik.services.Setio import SetioService
-Setio = SetioService()
-from tapiriik.services.Singletracker import SingletrackerService
-Singletracker = SingletrackerService()
-from tapiriik.services.Aerobia import AerobiaService
-Aerobia = AerobiaService()
+
+import tapiriik.local_settings as local_settings
+
+# service name and corresponding local_settings.py identifier,
+service_keys = {
+    'Aerobia': '',
+    'BeginnerTriathlete': 'BT_APIKEY',
+    'Dropbox': 'DROPBOX_APP_KEY',
+    'Endomondo': 'ENDOMONDO_CLIENT_KEY',
+    'GarminConnect': '',
+    'Motivato': 'MOTIVATO_PREMIUM_USERS_LIST_URL',
+    'NikePlus': 'NIKEPLUS_CLIENT_ID',
+    'Pulsstory': 'PULSSTORY_CLIENT_ID',
+    'RideWithGPS': 'RWGPS_APIKEY',
+    'RunKeeper': 'RUNKEEPER_CLIENT_ID',
+    'Setio': 'SETIO_CLIENT_ID',
+    'Singletracker': 'SINGLETRACKER_CLIENT_ID',
+    'Smashrun': 'SMASHRUN_CLIENT_ID',
+    'SportTracks': 'SPORTTRACKS_CLIENT_ID',
+    'Strava': 'STRAVA_CLIENT_ID',
+    'TrainAsONE': 'TRAINASONE_CLIENT_ID',
+    'TrainerRoad': '',
+    'TrainingPeaks': 'TRAININGPEAKS_CLIENT_ID',
+    'VeloHero': '',
+}
+
+GLOBALS = globals()
+for service_name in service_keys.keys():
+
+    # upper case service name in local_settings is checked for 'ignore' first
+    key = getattr(local_settings, service_name.upper(), None) or getattr(local_settings, service_keys[service_name], None)
+
+    # lonly import non-ignored services that have local_settings non-default setting.
+    if key == 'ignore' or key == '####' or key == 'http://...':
+        GLOBALS[service_name] = None
+    else:
+        tmp = __import__('tapiriik.services.'+service_name, GLOBALS, locals(), [service_name+'Service'], 0)
+        GLOBALS[service_name]= getattr(tmp, service_name+'Service')()
+
 
 PRIVATE_SERVICES = []
 try:
